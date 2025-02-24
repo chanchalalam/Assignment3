@@ -67,6 +67,7 @@ The model will process the text and return the most relevant answer.
 📁 Project Structure
 
 Ai-Scraper/
+
 ├── app.py               # Flask application (handles web scraping & Q&A)  
 ├── index.html           # Static UI (hosted on Netlify)  
 ├── requirements.txt     # Python dependencies  
