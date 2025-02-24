@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AiSensy Q&A Tool UI</title>
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background: #f2f7fd;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+      .container {
+        max-width: 900px;
+        background: #fff;
+        padding: 3em;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+        animation: fadeIn 1s ease;
+      }
+
+      h1 {
+        color: #4c6ef5;
+        font-size: 2.5em;
+        margin-bottom: 1.5em;
+        font-weight: 600;
+      }
+
+      .section {
+        background-color: #f8f9fa;
+        padding: 2em;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2em;
+        transition: transform 0.3s ease;
+      }
+      .section:hover {
+        transform: translateY(-5px);
+      }
+
+      label {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5em;
+        display: block;
+      }
+
+      textarea, input[type="text"] {
+        width: 100%;
+        padding: 1em;
+        font-size: 1.1em;
+        border: 1px solid #e1e4e8;
+        border-radius: 8px;
+        box-sizing: border-box;
+        margin-top: 0.5em;
+        margin-bottom: 1em;
+        transition: border-color 0.3s ease;
+      }
+
+      textarea:focus, input[type="text"]:focus {
+        border-color: #4c6ef5;
+        outline: none;
+      }
+
+      input[type="submit"] {
+        background-color: #4c6ef5;
+        color: white;
+        padding: 0.8em 2em;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #2a4cf2;
+        transform: translateY(-3px);
+      }
+
+      input[type="submit"]:disabled {
+        background-color: #b0b0b0;
+        cursor: not-allowed;
+      }
+
+      .note {
+        font-size: 0.9em;
+        color: #777;
+        margin-top: 1em;
+        text-align: center;
+      }
+
+      .answer {
+        background-color: #e0f7fa;
+        padding: 1.5em;
+        border-radius: 8px;
+        border: 1px solid #26c6da;
+        margin-top: 1.5em;
+        text-align: left;
+        display: none;
+        font-size: 1.1em;
+        color: #00796b;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .answer h3 {
+        color: #00796b;
+        font-size: 1.4em;
+        margin-bottom: 1em;
+      }
+
+      .message-box {
+        padding: 1em;
+        background-color: #f1f8e9;
+        border: 1px solid #c8e6c9;
+        border-radius: 8px;
+        margin-top: 1em;
+        color: #388e3c;
+        display: none;
+      }
+
+      .message-box.error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+      }
+
+      .message-box.warning {
+        background-color: #fff3cd;
+        border-color: #ffeeba;
+        color: #856404;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="section" id="ingest-section">
+        <h1>Enter URLs to Ingest Content</h1>
+        <form id="ingest-form">
+          <label for="urls">Enter one or more URLs (separated by commas or newlines):</label>
+          <textarea id="urls" name="urls" placeholder="https://example.com"></textarea>
+          <br>
+          <input type="submit" value="Ingest Content" id="ingest-btn" disabled>
+          <p class="note">*This form is for UI demonstration only. Backend functionality is not available on GitHub Pages.*</p>
+        </form>
+      </div>
+
+      <div class="section" id="qa-section">
+        <h1>Ask a Question</h1>
+        <form id="qa-form">
+          <label for="question">Enter your question (based solely on the ingested content):</label>
+          <input type="text" id="question" name="question" placeholder="What is this website about?" />
+          <br>
+          <input type="submit" value="Get Answer" id="qa-btn" disabled />
+          <p class="note">*This form is for UI demonstration only. Backend functionality is not available on GitHub Pages.*</p>
+        </form>
+
+        <div class="answer" id="answer-div">
+          <h3>Answer:</h3>
+          <p id="answer-text">No answer available in demo mode.</p>
+        </div>
+      </div>
+      <div class="message-box" id="message-box" style="display: none;">
+        <p id="message-text"></p>
+      </div>
+    </div>
+
+    <script>
+      const urlsInput = document.getElementById('urls');
+      const questionInput = document.getElementById('question');
+      const ingestBtn = document.getElementById('ingest-btn');
+      const qaBtn = document.getElementById('qa-btn');
+      const messageBox = document.getElementById('message-box');
+      const messageText = document.getElementById('message-text');
+      const answerDiv = document.getElementById('answer-div');
+      const answerText = document.getElementById('answer-text');
+
+      // Enable/Disable buttons based on input
+      urlsInput.addEventListener('input', () => {
+        ingestBtn.disabled = !urlsInput.value.trim();
+      });
+
+      questionInput.addEventListener('input', () => {
+        qaBtn.disabled = !questionInput.value.trim();
+      });
+
+      // Show message box
+      function showMessage(type, message) {
+        messageBox.style.display = 'block';
+        messageText.textContent = message;
+        messageBox.className = `message-box ${type}`;
+      }
+
+      // Simulate content ingestion
+      document.getElementById('ingest-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        showMessage('success', 'Content has been successfully ingested!');
+      });
+
+      // Simulate question answer and display it on the UI
+      document.getElementById('qa-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (urlsInput.value.trim()) {
+          // Simulated backend response
+          const simulatedAnswer = "Go Go is played on a grid (usually 19×19). It is an adversarial game between two players with the objective of capturing territory.";
+          
+          // Display the answer in the UI
+          answerDiv.style.display = 'block';
+          answerText.textContent = simulatedAnswer; // Set the answer text inside the <p> tag in the .answer div
+
+          // Show success message
+          showMessage('success', 'Here’s the answer to your question.');
+        } else {
+          answerDiv.style.display = 'none';
+          showMessage('error', 'Please ingest content before asking a question.');
+        }
+      });
+    </script>
+  </body>
+</html>
